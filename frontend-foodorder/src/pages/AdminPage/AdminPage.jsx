@@ -57,7 +57,10 @@ const AdminPage = () => {
     try {
       if (queries) {
         queries.forEach((query) => {
-          result[query?.data?.key] = query?.data?.data?.length;
+          // Chỉ thêm khi query đã trả dữ liệu hợp lệ (tránh key 'undefined')
+          if (query?.data?.key) {
+            result[query.data.key] = query?.data?.data?.length ?? 0;
+          }
         });
       }
       return result;
@@ -102,13 +105,7 @@ const AdminPage = () => {
           onClick={handleOnCLick}
         />
         <div style={{ flex: 1, padding: "15px 0 15px 15px" }}>
-          <Loading
-            isLoading={
-              memoCount &&
-              Object.keys(memoCount) &&
-              Object.keys(memoCount).length !== 3
-            }
-          >
+          <Loading isLoading={queries?.some((query) => query.isLoading)}>
             {!keySelected && (
               <CustomizedContent
                 data={memoCount}

@@ -32,6 +32,21 @@ const OrderAdmin = () => {
   const queryOrder = useQuery({ queryKey: ["orders"], queryFn: getAllOrder });
   const { isLoading: isLoadingOrders, data: orders } = queryOrder;
 
+  // Xóa nhiều đơn hàng (admin)
+  const handleDelteManyOrders = async (ids) => {
+    try {
+      const res = await OrderService.deleteManyOrder(ids, user?.access_token);
+      if (res?.status === "OK") {
+        message.success("Xóa đơn hàng thành công");
+      } else {
+        message.error(res?.message || "Xóa đơn hàng thất bại");
+      }
+    } catch (e) {
+      message.error("Xóa đơn hàng thất bại");
+    }
+    queryOrder.refetch();
+  };
+
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -184,6 +199,7 @@ const OrderAdmin = () => {
           columns={columns}
           isLoading={isLoadingOrders}
           data={dataTable}
+          handleDelteMany={handleDelteManyOrders}
         />
       </div>
     </div>

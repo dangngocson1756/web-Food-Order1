@@ -15,7 +15,6 @@ import * as UserService from "../../services/UserService";
 import { useMutationHooks } from "../../hooks/useMutationHook";
 import Loading from "../../components/LoadingComponent/Loading";
 import * as message from "../../components/Message/Message";
-import { useEffect } from "react";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -32,16 +31,7 @@ const SignUpPage = () => {
 
   const mutation = useMutationHooks((data) => UserService.signupUser(data));
 
-  const { data, isLoading, isSuccess, isError } = mutation;
-
-  useEffect(() => {
-    if (isSuccess) {
-      message.success();
-      handleNavigateSignIn();
-    } else if (isError) {
-      message.error();
-    }
-  }, [isSuccess, isError]);
+  const { isLoading } = mutation;
 
   const handleOnchangePassword = (value) => {
     setPassword(value);
@@ -79,7 +69,26 @@ const SignUpPage = () => {
       message.error("Mật khẩu nhập lại không khớp");
       return;
     }
-    mutation.mutate({ email, password, confirmPassword });
+    mutation.mutate(
+      { email, password, confirmPassword },
+      {
+        onSuccess: (data) => {
+          if (data?.status === "OK") {
+            message.success("Đăng ký thành công");
+            handleNavigateSignIn();
+          } else if (data?.message === "The email is already") {
+            message.error(
+              "Email này đã được đăng ký, vui lòng dùng email khác",
+            );
+          } else {
+            message.error(data?.message || "Đăng ký thất bại");
+          }
+        },
+        onError: () => {
+          message.error("Đăng ký thất bại, vui lòng thử lại");
+        },
+      },
+    );
   };
 
   return (
@@ -149,9 +158,6 @@ const SignUpPage = () => {
               onChange={handleOnchangeConfirmPassword}
             />
           </div>
-          {data?.status === "ERR" && (
-            <span style={{ color: "red" }}>{data?.message}</span>
-          )}
           <Loading isLoading={isLoading}>
             <ButtonComponent
               disabled={isLoading}

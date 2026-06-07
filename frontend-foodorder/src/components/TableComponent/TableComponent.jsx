@@ -1,20 +1,26 @@
-import { Table } from 'antd';
-import React, { useState } from 'react'
-import Loading from '../../components/LoadingComponent/Loading'
+import { Table } from "antd";
+import React, { useState } from "react";
+import Loading from "../../components/LoadingComponent/Loading";
 import { Excel } from "antd-table-saveas-excel";
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
 const TableComponent = (props) => {
-  const { selectionType = 'checkbox', data:dataSource = [], isLoading = false, columns = [], handleDelteMany } = props
-  const [rowSelectedKeys, setRowSelectedKeys] = useState([])
+  const {
+    selectionType = "checkbox",
+    data: dataSource = [],
+    isLoading = false,
+    columns = [],
+    handleDelteMany,
+  } = props;
+  const [rowSelectedKeys, setRowSelectedKeys] = useState([]);
   const newColumnExport = useMemo(() => {
-    const arr = columns?.filter((col) => col.dataIndex !== 'action')
-    return arr
-  }, [columns])
-  
+    const arr = columns?.filter((col) => col.dataIndex !== "action");
+    return arr;
+  }, [columns]);
+
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
-      setRowSelectedKeys(selectedRowKeys)
+      setRowSelectedKeys(selectedRowKeys);
     },
     // getCheckboxProps: (record) => ({
     //   disabled: record.name === 'Disabled User',
@@ -23,29 +29,32 @@ const TableComponent = (props) => {
     // }),
   };
   const handleDeleteAll = () => {
-    handleDelteMany(rowSelectedKeys)
-  }
+    if (typeof handleDelteMany === "function") {
+      handleDelteMany(rowSelectedKeys);
+    }
+  };
   const exportExcel = () => {
     const excel = new Excel();
     excel
       .addSheet("test")
       .addColumns(newColumnExport)
       .addDataSource(dataSource, {
-        str2Percent: true
+        str2Percent: true,
       })
       .saveAs("Excel.xlsx");
   };
-  
+
   return (
     <Loading isLoading={isLoading}>
-      {!!rowSelectedKeys.length && (
-        <div style={{
-          background: '#1d1ddd',
-          color: '#fff',
-          fontWeight: 'bold',
-          padding: '10px',
-          cursor: 'pointer'
-        }}
+      {!!rowSelectedKeys.length && handleDelteMany && (
+        <div
+          style={{
+            background: "#1d1ddd",
+            color: "#fff",
+            fontWeight: "bold",
+            padding: "10px",
+            cursor: "pointer",
+          }}
           onClick={handleDeleteAll}
         >
           Xóa tất cả
@@ -62,7 +71,7 @@ const TableComponent = (props) => {
         {...props}
       />
     </Loading>
-  )
-}
+  );
+};
 
-export default TableComponent
+export default TableComponent;

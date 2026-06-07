@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import * as UserService from "../../services/UserService";
 import { resetUser } from "../../redux/slides/userSlide";
+import { resetAllOrder } from "../../redux/slides/orderSlide";
 import { useState } from "react";
 import Loading from "../LoadingComponent/Loading";
 import { useEffect } from "react";
@@ -40,6 +41,7 @@ const HeaderComponent = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     setLoading(true);
     await UserService.logoutUser();
     dispatch(resetUser());
+    dispatch(resetAllOrder());
     setLoading(false);
   };
 
